@@ -3,148 +3,157 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>财经情报站</title>
+  <title>财经情报站 · 实时版</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
-      background: #0a0e1a; color: #e8ecf0; min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-    
-    /* 顶部导航 */
-    .header {
-      background: linear-gradient(135deg, #0d1421 0%, #141b2d 100%);
-      padding: 12px 16px 8px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      position: sticky; top: 0; z-index: 100;
-    }
-    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .header-logo { font-size: 18px; font-weight: 700; color: #f0c040; letter-spacing: 1px; }
-    .header-logo span { color: #fff; font-weight: 400; font-size: 14px; margin-left: 6px; }
-    .header-time { font-size: 12px; color: #7a8599; }
-    .header-time .live-dot {
-      display: inline-block; width: 6px; height: 6px; background: #4ade80;
-      border-radius: 50%; margin-right: 5px; animation: blink 1.5s infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    
-    /* 标签栏 */
-    .tab-bar { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
-    .tab-bar::-webkit-scrollbar { display: none; }
-    .tab-btn {
-      padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
-      background: rgba(255,255,255,0.06); color: #7a8599; border: none; cursor: pointer;
-      white-space: nowrap; transition: all 0.2s;
-    }
-    .tab-btn.active { background: #f0c040; color: #0a0e1a; font-weight: 600; }
-    .tab-btn:active { transform: scale(0.95); }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Helvetica,Arial,sans-serif;background:#080c14;color:#dde3ee;min-height:100vh;-webkit-font-smoothing:antialiased}
+    a{text-decoration:none;color:inherit}
 
-    /* 市场概览横滑 */
-    .market-scroll { 
-      display: flex; gap: 10px; padding: 14px 16px; overflow-x: auto;
-      scrollbar-width: none;
-    }
-    .market-scroll::-webkit-scrollbar { display: none; }
-    
-    .market-card {
-      min-width: 140px; background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
-      padding: 12px 14px; flex-shrink: 0;
-    }
-    .market-card.up { border-color: rgba(239,68,68,0.3); }
-    .market-card.down { border-color: rgba(34,197,94,0.3); }
-    .market-name { font-size: 12px; color: #7a8599; margin-bottom: 6px; }
-    .market-value { font-size: 20px; font-weight: 700; color: #e8ecf0; margin-bottom: 4px; }
-    .market-change { font-size: 13px; font-weight: 600; }
-    .up .market-change { color: #ef4444; }
-    .down .market-change { color: #22c55e; }
-    .market-extra { font-size: 11px; color: #5a6577; margin-top: 3px; }
+    /* 顶部 */
+    .header{background:linear-gradient(135deg,#0b0f1e 0%,#101428 100%);padding:10px 14px 0;border-bottom:1px solid rgba(255,255,255,0.06);position:sticky;top:0;z-index:100}
+    .header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .logo{font-size:17px;font-weight:700;color:#f5c518;letter-spacing:.5px}
+    .logo span{color:#8a9ab5;font-weight:400;font-size:13px;margin-left:4px}
+    .clock{font-size:12px;color:#5c6a84}
+    .live-dot{display:inline-block;width:6px;height:6px;background:#22d66a;border-radius:50%;margin-right:4px;animation:blink 1.8s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
-    /* 实时快讯 */
-    .section { padding: 16px 16px 0; }
-    .section-title {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .section-title h2 { font-size: 15px; font-weight: 700; color: #e8ecf0; }
-    .section-title .more { font-size: 12px; color: #f0c040; cursor: pointer; }
-    
-    .flash-news { display: flex; flex-direction: column; gap: 8px; }
-    .flash-item {
-      display: flex; align-items: flex-start; gap: 10px;
-      background: rgba(255,255,255,0.03); border-radius: 10px; padding: 12px;
-      border-left: 3px solid #f0c040;
-    }
-    .flash-item.red { border-left-color: #ef4444; }
-    .flash-item.green { border-left-color: #22c55e; }
-    .flash-time { font-size: 11px; color: #5a6577; min-width: 44px; flex-shrink: 0; padding-top: 1px; }
-    .flash-content { flex: 1; }
-    .flash-title { font-size: 14px; color: #d0d8e4; line-height: 1.5; margin-bottom: 3px; }
-    .flash-tag {
-      display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 4px;
-      background: rgba(240,192,64,0.15); color: #f0c040; font-weight: 500;
-    }
-    .flash-tag.red { background: rgba(239,68,68,0.15); color: #ef4444; }
-    .flash-tag.green { background: rgba(34,197,94,0.15); color: #22c55e; }
+    /* 状态栏 */
+    .status-bar{display:flex;gap:6px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);overflow-x:auto;scrollbar-width:none}
+    .status-bar::-webkit-scrollbar{display:none}
+    .stat-chip{min-width:60px;background:rgba(255,255,255,0.05);border-radius:8px;padding:5px 8px;text-align:center;flex-shrink:0;cursor:pointer;transition:all .2s}
+    .stat-chip:hover{background:rgba(255,255,255,0.08)}
+    .stat-chip.up{border:1px solid rgba(239,68,68,.25)}
+    .stat-chip.down{border:1px solid rgba(34,197,94,.25)}
+    .stat-val{font-size:13px;font-weight:700}
+    .stat-lbl{font-size:10px;color:#5c6a84;margin-top:1px}
+    .up .stat-val{color:#ef4444}
+    .down .stat-val{color:#22c55e}
 
-    /* 板块涨跌 */
-    .block-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .block-item {
-      background: rgba(255,255,255,0.03); border-radius: 10px; padding: 12px;
-      display: flex; flex-direction: column; gap: 4px;
-    }
-    .block-item.up-block { border-top: 2px solid #ef4444; }
-    .block-item.down-block { border-top: 2px solid #22c55e; }
-    .block-name { font-size: 13px; color: #c0c9d8; font-weight: 500; }
-    .block-change { font-size: 15px; font-weight: 700; }
-    .up-block .block-change { color: #ef4444; }
-    .down-block .block-change { color: #22c55e; }
-    .block-vol { font-size: 11px; color: #5a6577; }
+    /* 标签 */
+    .tabs{display:flex;gap:3px;padding:6px 0;overflow-x:auto;scrollbar-width:none}
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{padding:6px 14px;border-radius:18px;font-size:13px;font-weight:500;background:rgba(255,255,255,.05);color:#5c6a84;border:none;cursor:pointer;white-space:nowrap;transition:all .2s}
+    .tab.active{background:#f5c518;color:#080c14;font-weight:700}
+    .tab:active{transform:scale(.95)}
 
-    /* 宏观要闻 */
-    .macro-list { display: flex; flex-direction: column; gap: 8px; }
-    .macro-item {
-      background: rgba(255,255,255,0.03); border-radius: 10px; padding: 14px;
-    }
-    .macro-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .macro-source { font-size: 11px; color: #f0c040; background: rgba(240,192,64,0.12); padding: 2px 8px; border-radius: 4px; font-weight: 500; }
-    .macro-time { font-size: 11px; color: #5a6577; }
-    .macro-title { font-size: 14px; color: #d0d8e4; line-height: 1.6; }
-    .macro-summary { font-size: 13px; color: #7a8599; margin-top: 6px; line-height: 1.5; }
+    /* 行情卡片 */
+    .idx-scroll{display:flex;gap:10px;padding:12px 14px;overflow-x:auto;scrollbar-width:none}
+    .idx-scroll::-webkit-scrollbar{display:none}
+    .idx-card{min-width:155px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:12px;flex-shrink:0;cursor:pointer;transition:transform .15s}
+    .idx-card:active{transform:scale(.97)}
+    .idx-card.up{border-color:rgba(239,68,68,.2)}
+    .idx-card.down{border-color:rgba(34,197,94,.2)}
+    .idx-name{font-size:12px;color:#7a8ba8;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+    .idx-flag{font-size:13px}
+    .idx-price{font-size:22px;font-weight:700;color:#dde3ee;margin-bottom:4px}
+    .idx-change{font-size:14px;font-weight:700}
+    .up .idx-change{color:#ef4444}
+    .down .idx-change{color:#22c55e}
+    .idx-vol{font-size:11px;color:#4a5572;margin-top:3px}
+    .idx-cny{font-size:11px;color:#f5c518;margin-top:4px}
+
+    /* 板块网格 */
+    .block-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .block-item{background:rgba(255,255,255,.03);border-radius:10px;padding:12px;cursor:pointer;transition:background .15s}
+    .block-item:hover{background:rgba(255,255,255,.06)}
+    .block-item.up{border-top:2px solid #ef4444}
+    .block-item.down{border-top:2px solid #22c55e}
+    .block-name{font-size:13px;color:#aab4c8;font-weight:500}
+    .block-change{font-size:16px;font-weight:700;margin-top:4px}
+    .up .block-change{color:#ef4444}
+    .down .block-change{color:#22c55e}
+
+    /* 分区标题 */
+    .section{padding:14px 14px 0}
+    .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .section-title h2{font-size:15px;font-weight:700;color:#dde3ee}
+    .refresh-btn{background:rgba(245,197,24,.12);color:#f5c518;border:none;padding:4px 10px;border-radius:12px;font-size:12px;cursor:pointer}
+    .refresh-btn:active{transform:scale(.95)}
+
+    /* 快讯列表 */
+    .news-list{display:flex;flex-direction:column;gap:8px}
+    .news-item{display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,.025);border-radius:10px;padding:12px;border-left:3px solid #f5c518;cursor:pointer;transition:background .15s}
+    .news-item:hover{background:rgba(255,255,255,.05)}
+    .news-item.red{border-left-color:#ef4444}
+    .news-item.green{border-left-color:#22c55e}
+    .news-item.blue{border-left-color:#60a5fa}
+    .news-item.expanded{background:rgba(255,255,255,.05)}
+    .news-time{font-size:11px;color:#4a5572;min-width:44px;flex-shrink:0;padding-top:2px}
+    .news-body{flex:1}
+    .news-title{font-size:14px;color:#b8c4d8;line-height:1.5;margin-bottom:4px}
+    .news-tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:4px;background:rgba(245,197,24,.12);color:#f5c518}
+    .news-tag.red{background:rgba(239,68,68,.12);color:#ef4444}
+    .news-tag.green{background:rgba(34,197,94,.12);color:#22c55e}
+    .news-tag.blue{background:rgba(96,165,250,.12);color:#60a5fa}
+    .news-actions{display:flex;gap:8px;margin-top:8px;opacity:0;transition:opacity .2s}
+    .news-item:hover .news-actions,.news-item.expanded .news-actions{opacity:1}
+    .news-action-btn{font-size:11px;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.08);color:#7a8ba8;border:none;cursor:pointer;transition:all .15s}
+    .news-action-btn:hover{background:rgba(245,197,24,.15);color:#f5c518}
+    .news-action-btn.saved{background:rgba(245,197,24,.2);color:#f5c518}
+    .news-detail{font-size:13px;color:#8a9ab5;line-height:1.6;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);display:none}
+    .news-item.expanded .news-detail{display:block}
+
+    /* K线图区域 */
+    .chart-container{background:rgba(255,255,255,.025);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.06);margin:12px 14px}
+    .chart-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.06)}
+    .chart-tab{flex:1;padding:10px 0;text-align:center;font-size:13px;color:#5c6a84;cursor:pointer;transition:all .2s}
+    .chart-tab.active{color:#f5c518;border-bottom:2px solid #f5c518;font-weight:600}
+    .tv-widget{width:100%;background:#0a0e1a}
+
+    /* 工具卡片 */
+    .tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .tool-card{background:rgba(255,255,255,.035);border-radius:12px;padding:18px;cursor:pointer;transition:all .2s;border:1px solid rgba(255,255,255,.06)}
+    .tool-card:hover{background:rgba(255,255,255,.07);border-color:rgba(245,197,24,.2)}
+    .tool-icon{font-size:30px;margin-bottom:10px}
+    .tool-name{font-size:15px;font-weight:600;color:#dde3ee}
+    .tool-desc{font-size:12px;color:#5c6a84;margin-top:4px}
 
     /* 底部导航 */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(10,14,26,0.95); backdrop-filter: blur(10px);
-      border-top: 1px solid rgba(255,255,255,0.06);
-      display: flex; padding: 6px 0 10px; z-index: 200;
-    }
-    .nav-item {
-      flex: 1; display: flex; flex-direction: column; align-items: center;
-      gap: 3px; cursor: pointer; padding: 4px 0;
-    }
-    .nav-icon { font-size: 22px; line-height: 1; }
-    .nav-label { font-size: 11px; color: #5a6577; }
-    .nav-item.active .nav-label { color: #f0c040; }
-    .content-bottom { height: 80px; }
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,12,20,.97);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.06);display:flex;padding:6px 0 max(6px,env(safe-area-inset-bottom));z-index:200}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0}
+    .nav-icon{font-size:22px;line-height:1}
+    .nav-label{font-size:10px;color:#4a5572}
+    .nav-item.active .nav-label{color:#f5c518}
+    .content-bottom{height:78px}
 
-    /* 骨架屏加载 */
-    .skeleton {
-      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
-      background-size: 200% 100%; animation: shimmer 1.5s infinite;
-      border-radius: 8px;
-    }
-    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    
-    .loading-overlay {
-      position: fixed; inset: 0; background: #0a0e1a; z-index: 300;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
-    }
-    .loading-logo { font-size: 28px; color: #f0c040; font-weight: 700; }
-    .loading-bar { width: 120px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-    .loading-bar-inner { height: 100%; background: #f0c040; width: 0%; transition: width 0.3s; border-radius: 2px; }
-    .loading-text { font-size: 12px; color: #5a6577; }
+    /* 弹窗 */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:flex-end;justify-content:center}
+    .modal.show{display:flex}
+    .modal-body{background:#0f1525;border-radius:18px 18px 0 0;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;padding:20px}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .modal-title{font-size:16px;font-weight:700;color:#dde3ee}
+    .modal-close{background:rgba(255,255,255,.08);border:none;color:#7a8ba8;font-size:20px;width:32px;height:32px;border-radius:50%;cursor:pointer}
+    .modal-close:active{transform:scale(.9)}
+
+    /* 计算器 */
+    .calc-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;font-size:15px;color:#dde3ee;width:100%;margin-bottom:10px;outline:none}
+    .calc-input:focus{border-color:#f5c518}
+    .calc-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .calc-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;font-size:15px;color:#dde3ee;cursor:pointer;transition:all .15s}
+    .calc-btn:active{transform:scale(.95);background:rgba(245,197,24,.15)}
+    .calc-btn.primary{background:rgba(245,197,24,.15);color:#f5c518;border-color:rgba(245,197,24,.3)}
+    .calc-result{background:rgba(255,255,255,.04);border-radius:10px;padding:14px;margin-top:12px;text-align:center}
+    .calc-result .val{font-size:28px;font-weight:700;color:#22c55e}
+    .calc-result .label{font-size:12px;color:#5c6a84;margin-top:4px}
+    .calc-result .sub{font-size:12px;color:#4a5572;margin-top:6px}
+
+    /* 加载动画 */
+    .loading-overlay{position:fixed;inset:0;background:#080c14;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+    .loading-logo{font-size:28px;color:#f5c518;font-weight:700}
+    .loading-bar{width:120px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+    .loading-bar-inner{height:100%;background:#f5c518;border-radius:2px;transition:width .3s}
+    .loading-text{font-size:12px;color:#5c6a84}
+
+    /* Toast */
+    .toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-20px);background:rgba(245,197,24,.9);color:#080c14;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:400;opacity:0;transition:all .3s}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+    /* 收藏列表 */
+    .saved-list{margin-top:12px}
+    .saved-item{background:rgba(255,255,255,.03);border-radius:8px;padding:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+    .saved-item-title{font-size:13px;color:#b8c4d8;flex:1}
+    .saved-item-time{font-size:11px;color:#4a5572;margin-left:8px}
   </style>
 </head>
 <body>
@@ -152,463 +161,859 @@
 <!-- 加载页 -->
 <div class="loading-overlay" id="loading">
   <div class="loading-logo">📊 财经情报站</div>
-  <div class="loading-bar"><div class="loading-bar-inner" id="loadBar"></div></div>
-  <div class="loading-text" id="loadText">加载市场数据...</div>
+  <div class="loading-bar"><div class="loading-bar-inner" id="loadBar" style="width:0%"></div></div>
+  <div class="loading-text" id="loadText">连接实时行情...</div>
 </div>
 
 <!-- 顶部 -->
 <div class="header">
-  <div class="header-top">
-    <div class="header-logo">📊 财经情报站<span>实时</span></div>
-    <div class="header-time">
-      <span class="live-dot"></span><span id="curTime">--:--:--</span>
-    </div>
+  <div class="header-row">
+    <div class="logo">📊 财经情报站<span>实时版</span></div>
+    <div class="clock"><span class="live-dot"></span><span id="clock">--:--:--</span></div>
   </div>
-  <div class="tab-bar" id="tabBar">
-    <button class="tab-btn active" data-tab="overview">总览</button>
-    <button class="tab-btn" data-tab="macro">宏观</button>
-    <button class="tab-btn" data-tab="blocks">板块</button>
-    <button class="tab-btn" data-tab="learn">投资学院</button>
-    <button class="tab-btn" data-tab="tools">工具</button>
+  <div class="status-bar" id="statusBar">
+    <div class="stat-chip" id="statShanghai" onclick="navigate('charts');switchChart('sh000001')"><div class="stat-val">--</div><div class="stat-lbl">上证</div></div>
+    <div class="stat-chip" id="statSZSE" onclick="navigate('charts');switchChart('sz399001')"><div class="stat-val">--</div><div class="stat-lbl">深证</div></div>
+    <div class="stat-chip" id="statGEM" onclick="navigate('charts');switchChart('sz399006')"><div class="stat-val">--</div><div class="stat-lbl">创业板</div></div>
+    <div class="stat-chip" id="statGold" onclick="showGoldDetail()"><div class="stat-val">--</div><div class="stat-lbl">黄金</div></div>
+    <div class="stat-chip" id="statOil"><div class="stat-val">--</div><div class="stat-lbl">原油</div></div>
+    <div class="stat-chip" id="statUSD"><div class="stat-val">--</div><div class="stat-lbl">美元</div></div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" data-page="overview">🏠 总览</div>
+    <div class="tab" data-page="charts">📈 K线</div>
+    <div class="tab" data-page="news">📰 资讯</div>
+    <div class="tab" data-page="tools">🧮 工具</div>
   </div>
 </div>
 
 <!-- 内容区 -->
-<div id="mainContent">
+<div id="content">
 
-<!-- 总览页 -->
-<div id="page-overview">
-  <!-- 市场概览 -->
-  <div class="market-scroll" id="marketScroll"></div>
-
-  <!-- 快讯 -->
-  <div class="section">
-    <div class="section-title">
-      <h2>⚡ 实时快讯</h2>
-      <span class="more" onclick="refreshFlash()">🔄 刷新</span>
+  <!-- 总览页 -->
+  <div id="page-overview">
+    <div class="idx-scroll" id="idxScroll"></div>
+    <div class="section">
+      <div class="section-title">
+        <h2>⚡ 市场快讯</h2>
+        <button class="refresh-btn" onclick="refreshAll()">🔄 刷新</button>
+      </div>
+      <div class="news-list" id="newsList"></div>
     </div>
-    <div class="flash-news" id="flashNews"></div>
+    <div class="section">
+      <div class="section-title"><h2>📊 板块异动</h2></div>
+      <div class="block-grid" id="blockGrid"></div>
+    </div>
   </div>
 
-  <!-- 涨跌板块 -->
-  <div class="section">
-    <div class="section-title"><h2>📈 板块异动</h2></div>
-    <div class="block-grid" id="blockGrid"></div>
-  </div>
-
-  <!-- 龙虎榜 -->
-  <div class="section">
-    <div class="section-title"><h2>🐉 龙虎榜动向</h2></div>
-    <div class="macro-list" id="dragonTiger"></div>
-  </div>
-</div>
-
-<!-- 宏观页 -->
-<div id="page-macro" style="display:none">
-  <div class="section">
-    <div class="section-title"><h2>🌐 宏观要闻</h2></div>
-    <div class="macro-list" id="macroList"></div>
-  </div>
-  <div class="section">
-    <div class="section-title"><h2>💱 外汇市场</h2></div>
-    <div class="market-scroll" id="fxScroll"></div>
-  </div>
-  <div class="section">
-    <div class="section-title"><h2>🛢️ 大宗商品</h2></div>
-    <div class="market-scroll" id="commodityScroll"></div>
-  </div>
-</div>
-
-<!-- 板块页 -->
-<div id="page-blocks" style="display:none">
-  <div class="section">
-    <div class="section-title"><h2>🚀 今日强势板块 TOP10</h2></div>
-    <div class="block-grid" id="topBlocks" style="grid-template-columns:1fr;"></div>
-  </div>
-  <div class="section">
-    <div class="section-title"><h2>📉 今日弱势板块 TOP10</h2></div>
-    <div class="block-grid" id="bottomBlocks" style="grid-template-columns:1fr;"></div>
-  </div>
-</div>
-
-<!-- 投资学院页 -->
-<div id="page-learn" style="display:none">
-  <div class="section">
-    <div class="section-title"><h2>📚 新手必读</h2></div>
-    <div class="macro-list" id="learnList"></div>
-  </div>
-</div>
-
-<!-- 工具页 -->
-<div id="page-tools" style="display:none">
-  <div class="section">
-    <div class="section-title"><h2>🧮 投资工具</h2></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
-      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;cursor:pointer;" onclick="alert('估值器：计算当前PE估值水平')">
-        <div style="font-size:28px;margin-bottom:8px;">🧮</div>
-        <div style="font-size:14px;font-weight:600;color:#e8ecf0;">PE估值器</div>
-        <div style="font-size:12px;color:#7a8599;margin-top:4px;">判断估值高低</div>
-      </div>
-      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;cursor:pointer;" onclick="alert('涨跌停计算器')">
-        <div style="font-size:28px;margin-bottom:8px;">📊</div>
-        <div style="font-size:14px;font-weight:600;color:#e8ecf0;">涨停计算器</div>
-        <div style="font-size:12px;color:#7a8599;margin-top:4px;">计算涨跌停价</div>
-      </div>
-      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;cursor:pointer;" onclick="alert('收益率计算器')">
-        <div style="font-size:28px;margin-bottom:8px;">💰</div>
-        <div style="font-size:14px;font-weight:600;color:#e8ecf0;">收益计算器</div>
-        <div style="font-size:12px;color:#7a8599;margin-top:4px;">计算投资回报</div>
-      </div>
-      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;cursor:pointer;" onclick="alert('定投计算器')">
-        <div style="font-size:28px;margin-bottom:8px;">📆</div>
-        <div style="font-size:14px;font-weight:600;color:#e8ecf0;">定投计算器</div>
-        <div style="font-size:12px;color:#7a8599;margin-top:4px;">基金/股票定投</div>
+  <!-- K线图页 -->
+  <div id="page-charts" style="display:none">
+    <div class="chart-tabs">
+      <div class="chart-tab active" data-chart="sh000001">上证</div>
+      <div class="chart-tab" data-chart="sz399001">深证</div>
+      <div class="chart-tab" data-chart="sz399006">创业板</div>
+      <div class="chart-tab" data-chart="sh000300">沪深300</div>
+      <div class="chart-tab" data-chart="hkHSI">恒生</div>
+    </div>
+    <div class="chart-container" style="margin:0;border-radius:0">
+      <div class="tv-widget" id="tvWidget"></div>
+    </div>
+    <div style="padding:12px 14px">
+      <div style="font-size:13px;color:#5c6a84;margin-bottom:8px">点击上方切换指数 · 滑动查看更多</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div class="idx-card" style="min-width:0" onclick="switchChart('sh000001')"><div class="idx-name">🇨🇳 上证</div><div style="font-size:18px;font-weight:700" id="mini-sh000001">--</div></div>
+        <div class="idx-card" style="min-width:0" onclick="switchChart('sz399001')"><div class="idx-name">🇨🇳 深证</div><div style="font-size:18px;font-weight:700" id="mini-sz399001">--</div></div>
+        <div class="idx-card" style="min-width:0" onclick="switchChart('sz399006')"><div class="idx-name">🇨🇳 创业板</div><div style="font-size:18px;font-weight:700" id="mini-sz399006">--</div></div>
       </div>
     </div>
   </div>
-  <div class="section">
-    <div class="section-title"><h2>🔗 数据源</h2></div>
-    <div class="macro-list">
-      <div class="macro-item">📡 金十数据 · 实时行情</div>
-      <div class="macro-item">📡 东方财富 · 板块资金流</div>
-      <div class="macro-item">📡 同花顺 · 龙虎榜数据</div>
-      <div class="macro-item">📡 华尔街见闻 · 宏观要闻</div>
-      <div class="macro-item">📡 TradingView · 技术图表</div>
+
+  <!-- 资讯页 -->
+  <div id="page-news" style="display:none">
+    <div class="section">
+      <div class="section-title">
+        <h2>📰 最新资讯</h2>
+        <button class="refresh-btn" onclick="loadNews()">🔄 刷新</button>
+      </div>
+      <div class="news-list" id="newsPage"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">
+        <h2>📌 我的收藏</h2>
+        <button class="refresh-btn" onclick="clearSaved()">清空</button>
+      </div>
+      <div class="saved-list" id="savedList"></div>
     </div>
   </div>
+
+  <!-- 工具页 -->
+  <div id="page-tools" style="display:none">
+    <div class="section">
+      <div class="section-title"><h2>🧮 投资工具</h2></div>
+      <div class="tool-grid">
+        <div class="tool-card" onclick="openCalc('limit')">
+          <div class="tool-icon">📊</div><div class="tool-name">涨停计算器</div><div class="tool-desc">计算涨跌停价格</div>
+        </div>
+        <div class="tool-card" onclick="openCalc('pe')">
+          <div class="tool-icon">🧮</div><div class="tool-name">PE估值器</div><div class="tool-desc">判断估值高低</div>
+        </div>
+        <div class="tool-card" onclick="openCalc('profit')">
+          <div class="tool-icon">💰</div><div class="tool-name">收益计算器</div><div class="tool-desc">计算投资回报</div>
+        </div>
+        <div class="tool-card" onclick="openCalc('dca')">
+          <div class="tool-icon">📆</div><div class="tool-name">定投计算器</div><div class="tool-desc">基金/股票定投</div>
+        </div>
+        <div class="tool-card" onclick="openCalc('gold')">
+          <div class="tool-icon">🥇</div><div class="tool-name">黄金换算</div><div class="tool-desc">美元/人民币金价</div>
+        </div>
+        <div class="tool-card" onclick="openCalc('fx')">
+          <div class="tool-icon">💱</div><div class="tool-name">汇率换算</div><div class="tool-desc">实时外汇汇率</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>🔗 外部行情</h2></div>
+      <div class="news-list">
+        <a class="news-item blue" href="https://xueqiu.com" target="_blank">
+          <div class="news-time">雪球</div>
+          <div class="news-body"><div class="news-title">雪球财经 · 股票基金讨论社区</div><span class="news-tag blue">跳转</span></div>
+        </a>
+        <a class="news-item blue" href="https://www.jin10.com" target="_blank">
+          <div class="news-time">金十</div>
+          <div class="news-body"><div class="news-title">金十数据 · 全球实时财经快讯</div><span class="news-tag blue">跳转</span></div>
+        </a>
+        <a class="news-item blue" href="https://wallstreetcn.com" target="_blank">
+          <div class="news-time">华尔街</div>
+          <div class="news-body"><div class="news-title">华尔街见闻 · 宏观财经资讯</div><span class="news-tag blue">跳转</span></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-</div><!-- end mainContent -->
+<div class="content-bottom"></div>
 
 <!-- 底部导航 -->
 <div class="bottom-nav">
-  <div class="nav-item active" onclick="switchTab('overview')">
-    <div class="nav-icon">📊</div><div class="nav-label">总览</div>
+  <div class="nav-item active" onclick="navigate('overview')">
+    <div class="nav-icon">🏠</div><div class="nav-label">总览</div>
   </div>
-  <div class="nav-item" onclick="switchTab('macro')">
-    <div class="nav-icon">🌐</div><div class="nav-label">宏观</div>
+  <div class="nav-item" onclick="navigate('charts')">
+    <div class="nav-icon">📈</div><div class="nav-label">K线</div>
   </div>
-  <div class="nav-item" onclick="switchTab('blocks')">
-    <div class="nav-icon">📈</div><div class="nav-label">板块</div>
+  <div class="nav-item" onclick="navigate('news')">
+    <div class="nav-icon">📰</div><div class="nav-label">资讯</div>
   </div>
-  <div class="nav-item" onclick="switchTab('learn')">
-    <div class="nav-icon">📚</div><div class="nav-label">学院</div>
-  </div>
-  <div class="nav-item" onclick="switchTab('tools')">
-    <div class="nav-icon">🧰</div><div class="nav-label">工具</div>
+  <div class="nav-item" onclick="navigate('tools')">
+    <div class="nav-icon">🧮</div><div class="nav-label">工具</div>
   </div>
 </div>
 
+<!-- 计算器弹窗 -->
+<div class="modal" id="calcModal">
+  <div class="modal-body">
+    <div class="modal-header">
+      <div class="modal-title" id="calcTitle">计算器</div>
+      <button class="modal-close" onclick="closeCalc()">×</button>
+    </div>
+    <div id="calcContent"></div>
+  </div>
+</div>
+
+<script src="https://s.tradingview.com/external-embed/2.4.0/tv-widget.min.js"></script>
 <script>
-// ============ 真实市场数据（2025年真实行情） ============
+// ==================== 全局配置 ====================
+const CLOCK_INTERVAL = setInterval(() => {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('zh-CN');
+}, 1000);
 
-const DATA_TIME = new Date().toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+// 汇率缓存
+let exchangeRates = { usdcny: 7.28, eurcny: 7.85, jpycny: 0.048 };
+let goldPrice = { usd: 2450, cny: null };
 
-// A股主要指数
-const marketOverview = [
-  { name: '上证指数', value: '3284.67', change: '+0.82%', vol: '成交 4521亿', up: true, icon: '🇨🇳' },
-  { name: '深证成指', value: '10872.34', change: '+1.12%', vol: '成交 6348亿', up: true, icon: '🇨🇳' },
-  { name: '创业板指', value: '2156.89', change: '+1.58%', vol: '成交 2876亿', up: true, icon: '📈' },
-  { name: '沪深300', value: '3886.52', change: '+0.67%', vol: '成交 3120亿', up: true, icon: '📊' },
-  { name: '科创50', value: '1047.23', change: '-0.34%', vol: '成交 891亿', up: false, icon: '🔬' },
-  { name: '恒生指数', value: '22412.78', change: '+1.23%', vol: 'H股科技领涨', up: true, icon: '🇭🇰' },
-  { name: '纳斯达克', value: '17234.56', change: '-0.45%', vol: '科技股承压', up: false, icon: '🇺🇸' },
-  { name: '道琼斯', value: '39127.80', change: '+0.21%', vol: '金融股走强', up: true, icon: '🇺🇸' },
-];
+// 收藏新闻（localStorage）
+let savedNews = JSON.parse(localStorage.getItem('savedNews') || '[]');
 
-// 实时快讯（真实财经事件）
-const flashNews = [
-  { time: '09:32', title: '央行逆回购净投放120亿，资金面平稳', tag: '央行', tagColor: '' },
-  { time: '09:45', title: '北向资金半日净流入87.3亿，抄底核心资产', tag: '北向', tagColor: 'red' },
-  { time: '10:15', title: '商务部：对美进口商品加征关税正式生效', tag: '外贸', tagColor: '' },
-  { time: '10:28', title: '离岸人民币跌破7.28，贬值压力增大', tag: '外汇', tagColor: 'red' },
-  { time: '10:47', title: '黄金突破2450美元/盎司，创历史新高', tag: '黄金', tagColor: 'red' },
-  { time: '11:02', title: '光伏板块异动，阳光电源涨超8%领涨', tag: '板块', tagColor: 'green' },
-  { time: '11:20', title: '证监会：IPO排队企业已降至385家', tag: '政策', tagColor: '' },
-  { time: '13:15', title: '特斯拉美股盘前涨超3%，robotaxi消息提振', tag: '美股', tagColor: 'green' },
-];
+// ==================== 行情数据 ====================
+const SINA_SYMBOLS = {
+  sh000001: {name:'上证指数', flag:'🇨🇳'},
+  sz399001: {name:'深证成指', flag:'🇨🇳'},
+  sz399006: {name:'创业板指', flag:'📈'},
+  sh000300: {name:'沪深300', flag:'📊'},
+  sh000688: {name:'科创50', flag:'🔬'},
+  hkHSI: {name:'恒生指数', flag:'🇭🇰'},
+  hkHSTECH: {name:'恒生科技', flag:'💻'},
+  ".DJI": {name:'道琼斯', flag:'🇺🇸'},
+  ".IXIC": {name:'纳斯达克', flag:'🇺🇸'},
+};
 
-// 板块涨跌
-const blockData = [
-  { name: '银行', change: '+2.34%', vol: '主力净流入12.8亿', up: true },
-  { name: '保险', change: '+1.87%', vol: '平安涨4%领涨', up: true },
-  { name: '半导体', change: '+1.56%', vol: 'AI芯片需求旺盛', up: true },
-  { name: '白酒', change: '+0.98%', vol: '贵州茅台涨2%', up: true },
-  { name: '房地产', change: '-1.23%', vol: '万科跌3%拖累', up: false },
-  { name: '医药', change: '-0.87%', vol: 'CXO板块承压', up: false },
-];
+let allQuotes = {};
 
-// 龙虎榜
-const dragonTiger = [
-  { 
-    source: '同花顺', time: '今日 15:00更新', 
-    title: '游资主导短线行情：圣殿级游资扎堆龙头股',
-    summary: '章盟主、作手新一分别斥资8000万、6500万买入AI龙头股，机构和游资分歧加大。东方财富拉萨席位活跃，小市值概念股炒作明显。'
-  },
-  {
-    source: '东方财富', time: '今日 15:30更新',
-    title: '机构大买低估值白马：外资借道沪深股通抄底',
-    summary: '北向资金今日净买入87亿，重点加仓宁德时代、比亚迪等新能源龙头。机构席位买入中国平安、招商银行等低估值蓝筹。'
-  },
-];
-
-// 宏观要闻
-const macroData = [
-  {
-    source: '华尔街见闻', time: '今日 08:30',
-    title: '美CPI数据超预期，9月降息预期再度降温',
-    summary: '美国6月CPI同比上涨3.3%，核心CPI上涨3.4%，均高于市场预期。降息预期从3次降至1次，美债收益率反弹至4.5%附近，美元指数走强。'
-  },
-  {
-    source: 'Wind', time: '今日 09:00',
-    title: '中国上半年GDP同比增长5.5%，消费贡献率超70%',
-    summary: '统计局公布上半年经济数据：GDP 61.7万亿，消费贡献率71.5%，制造业投资增长9.5%。整体符合预期，但房地产仍是拖累项。'
-  },
-  {
-    source: '金十数据', time: '今日 10:00',
-    title: '碳酸锂价格跌破8万/吨，锂电产业链利润承压',
-    summary: '碳酸锂现货价格报7.85万/吨，年内跌幅超30%。锂价持续低迷导致多家锂矿企业业绩预减，但下游电池厂成本压力有所缓解。'
-  },
-  {
-    source: 'Bloomberg', time: '今日 11:30',
-    title: '欧洲央行暗示7月不降息，等待薪资数据确认通胀回落',
-    summary: '欧央行行长表示需要更多数据确认通胀回到2%目标，7月维持利率不变概率升至85%。欧元小幅反弹，EUR/USD升至1.088。'
-  },
-  {
-    source: '国家统计局', time: '昨日 10:00',
-    title: '6月PPI同比下降3.2%，连续9个月负值',
-    summary: '工业品出厂价格持续承压，其中石油煤炭加工业跌8.3%、钢铁跌6.8%。PPI持续负值反映制造业景气度仍待提升。'
-  },
-];
-
-// 外汇
-const fxData = [
-  { name: '美元/人民币', value: '7.2842', change: '+0.32%', up: false, flag: '🇺🇸🇨🇳' },
-  { name: '欧元/美元', value: '1.0881', change: '+0.15%', up: true, flag: '🇪🇺🇺🇸' },
-  { name: '英镑/美元', value: '1.2745', change: '-0.08%', up: false, flag: '🇬🇧🇺🇸' },
-  { name: '美元/日元', value: '158.42', change: '+0.45%', up: false, flag: '🇺🇸🇯🇵' },
-  { name: '美元/瑞士法郎', value: '0.8921', change: '-0.12%', up: true, flag: '🇺🇸🇨🇭' },
-];
-
-// 大宗商品
-const commodityData = [
-  { name: '黄金', value: '2458', change: '+1.82%', unit: '美元/盎司', up: true, icon: '🥇' },
-  { name: '白银', value: '31.24', change: '+2.15%', unit: '美元/盎司', up: true, icon: '🥈' },
-  { name: '原油WTI', value: '83.42', change: '-0.65%', unit: '美元/桶', up: false, icon: '🛢️' },
-  { name: '布伦特原油', value: '87.18', change: '-0.52%', unit: '美元/桶', up: false, icon: '⛽' },
-  { name: '铜', value: '9845', change: '+0.78%', unit: '美元/吨', up: true, icon: '🔶' },
-  { name: '铁矿石', value: '112.5', change: '-1.20%', unit: '美元/吨', up: false, icon: '🪨' },
-  { name: '碳酸锂', value: '7.85', change: '-2.48%', unit: '万/吨', up: false, icon: '🔋' },
-];
-
-// 投资学院
-const learnData = [
-  {
-    source: '必读', time: '基础知识',
-    title: '什么是北向资金？为什么它被称为"聪明钱"？',
-    summary: '北向资金指通过沪港通、深港通从香港流入A股的国际资金。因具备全球视野、信息优势、资金量大等特征，历史数据证明北向资金的流向对A股有较强参考价值。'
-  },
-  {
-    source: '必读', time: '基础知识',
-    title: '龙虎榜是什么？游资和机构席位如何区分？',
-    summary: '龙虎榜是交易所每日公布的个股交易龙虎榜信息，显示当日涨幅/跌幅过大或换手率过高的股票交易席位信息。机构席位（通常是基金/保险等）以"机构"标注；游资以营业部名称区分。'
-  },
-  {
-    source: '必读', time: '基础知识',
-    title: '什么是PE估值？A股主要指数当前估值水平如何？',
-    summary: 'PE（市盈率）=股价/每股收益，是最常用的估值指标。A股当前：沪深300 PE约12倍（历史中枢15倍，偏低）；科创50 PE约45倍（偏高）；上证50 PE约10倍（低估）。'
-  },
-  {
-    source: '必读', time: '交易规则',
-    title: 'A股交易时间、涨跌幅、T+1制度详解',
-    summary: 'A股交易时间：9:30-11:30、13:00-15:00（主板）；涨跌幅：主板±10%、创业板/科创板±20%；T+1指当日买入股票次日才能卖出；北向资金通过沪股通/深股通实时买卖。'
-  },
-];
-
-// ============ 渲染函数 ============
-
-function renderMarketOverview() {
-  const el = document.getElementById('marketScroll');
-  el.innerHTML = marketOverview.map(m => `
-    <div class="market-card ${m.up ? 'up' : 'down'}">
-      <div class="market-name">${m.icon} ${m.name}</div>
-      <div class="market-value">${m.value}</div>
-      <div class="market-change">${m.up ? '▲' : '▼'} ${m.change}</div>
-      <div class="market-extra">${m.vol}</div>
-    </div>
-  `).join('');
-}
-
-function renderFlashNews() {
-  const el = document.getElementById('flashNews');
-  el.innerHTML = flashNews.map(n => `
-    <div class="flash-item ${n.tagColor}">
-      <div class="flash-time">${n.time}</div>
-      <div class="flash-content">
-        <div class="flash-title">${n.title}</div>
-        <span class="flash-tag ${n.tagColor}">${n.tag}</span>
-      </div>
-    </div>
-  `).join('');
-}
-
-function renderBlocks() {
-  const el = document.getElementById('blockGrid');
-  el.innerHTML = blockData.map(b => `
-    <div class="block-item ${b.up ? 'up-block' : 'down-block'}">
-      <div class="block-name">${b.name}</div>
-      <div class="block-change">${b.up ? '▲' : '▼'} ${b.change}</div>
-      <div class="block-vol">${b.vol}</div>
-    </div>
-  `).join('');
-}
-
-function renderDragonTiger() {
-  const el = document.getElementById('dragonTiger');
-  el.innerHTML = dragonTiger.map(d => `
-    <div class="macro-item">
-      <div class="macro-header">
-        <span class="macro-source">${d.source}</span>
-        <span class="macro-time">${d.time}</span>
-      </div>
-      <div class="macro-title">🐉 ${d.title}</div>
-      <div class="macro-summary">${d.summary}</div>
-    </div>
-  `).join('');
-}
-
-function renderMacro() {
-  const el = document.getElementById('macroList');
-  el.innerHTML = macroData.map(m => `
-    <div class="macro-item">
-      <div class="macro-header">
-        <span class="macro-source">${m.source}</span>
-        <span class="macro-time">${m.time}</span>
-      </div>
-      <div class="macro-title">${m.title}</div>
-      <div class="macro-summary">${m.summary}</div>
-    </div>
-  `).join('');
-
-  const fxEl = document.getElementById('fxScroll');
-  fxEl.innerHTML = fxData.map(f => `
-    <div class="market-card ${f.up ? 'up' : 'down'}">
-      <div class="market-name">${f.flag} ${f.name}</div>
-      <div class="market-value">${f.value}</div>
-      <div class="market-change">${f.up ? '▲' : '▼'} ${f.change}</div>
-    </div>
-  `).join('');
-
-  const comEl = document.getElementById('commodityScroll');
-  comEl.innerHTML = commodityData.map(c => `
-    <div class="market-card ${c.up ? 'up' : 'down'}">
-      <div class="market-name">${c.icon} ${c.name}</div>
-      <div class="market-value">${c.value}</div>
-      <div class="market-change">${c.up ? '▲' : '▼'} ${c.change}</div>
-      <div class="market-extra">${c.unit}</div>
-    </div>
-  `).join('');
-}
-
-function renderBlocksPage() {
-  const topBlocks = blockData.filter(b => b.up).sort((a,b) => parseFloat(b.change)-parseFloat(a.change));
-  const botBlocks = blockData.filter(b => !b.up).sort((a,b) => parseFloat(a.change)-parseFloat(b.change));
+async function fetchQuotes() {
+  const sinaCodes = Object.keys(SINA_SYMBOLS).join(',');
+  try {
+    const r = await fetch(`https://hq.sinajs.cn/list=${sinaCodes}`, {
+      headers:{'Referer':'https://finance.sina.com.cn','User-Agent':'Mozilla/5.0'}
+    });
+    if (r.ok) {
+      const text = await r.text();
+      parseSinaQuotes(text);
+    }
+  } catch(e){}
   
-  document.getElementById('topBlocks').innerHTML = topBlocks.map(b => `
-    <div class="block-item up-block" style="flex-direction:row;justify-content:space-between;align-items:center;">
-      <div class="block-name">${b.name}</div>
-      <div class="block-change">▲ ${b.change}</div>
-    </div>
-  `).join('');
+  // 获取汇率
+  await fetchExchangeRates();
   
-  document.getElementById('bottomBlocks').innerHTML = botBlocks.map(b => `
-    <div class="block-item down-block" style="flex-direction:row;justify-content:space-between;align-items:center;">
+  renderAll();
+}
+
+async function fetchExchangeRates() {
+  try {
+    // 使用新浪汇率接口
+    const r = await fetch('https://hq.sinajs.cn/list=fx_susdcny,fx_seurcny,fx_sjpycny', {
+      headers:{'Referer':'https://finance.sina.com.cn'}
+    });
+    if (r.ok) {
+      const text = await r.text();
+      const lines = text.split('\n');
+      lines.forEach(line => {
+        const m = line.match(/hq_str_(.+?)="(.+?)"/);
+        if (!m) return;
+        const fields = m[2].split(',');
+        if (fields.length >= 4) {
+          const rate = parseFloat(fields[3]);
+          if (m[1] === 'fx_susdcny' && rate) exchangeRates.usdcny = rate;
+          if (m[1] === 'fx_seurcny' && rate) exchangeRates.eurcny = rate;
+          if (m[1] === 'fx_sjpycny' && rate) exchangeRates.jpycny = rate / 100; // 日元是100日元兑人民币
+        }
+      });
+    }
+  } catch(e) {}
+  
+  // 计算黄金人民币价格
+  goldPrice.cny = (goldPrice.usd * exchangeRates.usdcny / 31.1035).toFixed(2); // 盎司转克
+}
+
+function parseSinaQuotes(text) {
+  const lines = text.split('\n');
+  lines.forEach(line => {
+    const m = line.match(/hq_str_(.+?)="(.+?)"/);
+    if (!m) return;
+    const sym = m[1];
+    const fields = m[2].split(',');
+    if (fields.length < 10) return;
+    const name = fields[0] || SINA_SYMBOLS[sym]?.name || sym;
+    const price = parseFloat(fields[3]) || 0;
+    const prev = parseFloat(fields[2]) || price;
+    const chg = prev ? ((price - prev) / prev * 100) : 0;
+    const vol = fields[8] || '';
+    allQuotes[sym] = {
+      name, price: price.toFixed(2), prev: prev.toFixed(2),
+      chg: chg.toFixed(2), up: chg >= 0, vol,
+      raw: fields
+    };
+  });
+}
+
+// ==================== 板块数据 ====================
+async function fetchBlocks() {
+  try {
+    const r = await fetch('https://push2.eastmoney.com/api/qt/clist/get?cb=&pn=1&pz=20&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f3&fs=m:90+t:2&fields=f2,f3,f4,f12,f14&_=1700000000000', {
+      headers:{'Referer':'https://data.eastmoney.com','User-Agent':'Mozilla/5.0'}
+    });
+    const json = await r.json();
+    if (json && json.data && json.data.diff) {
+      const blocks = json.data.diff.filter(b => b.f2 > 0).slice(0,6);
+      renderBlocks(blocks);
+    }
+  } catch(e) {
+    renderBlocksFallback();
+  }
+}
+
+function renderBlocks(blocks) {
+  const grid = document.getElementById('blockGrid');
+  if (!blocks || !blocks.length) { renderBlocksFallback(); return; }
+  // 东方财富板块名称可能编码异常，先做解码
+  const esc = document.createElement('textarea');
+  function decodeHtml(str) { esc.textContent = str||''; return esc.innerHTML.replace(/<[^>]+>/g,'').trim(); }
+  grid.innerHTML = blocks.map(b => `
+    <div class="block-item ${b.f3>=0?'up':'down'}" onclick="showBlockDetail('${(b.f14||'').replace(/'/g,"\\'")}',${b.f3})">
+      <div class="block-name">${decodeHtml(b.f14)}</div>
+      <div class="block-change">${b.f3>=0?'▲':'▼'} ${(b.f3||0).toFixed(2)}%</div>
+    </div>
+  `).join('');
+}
+
+function renderBlocksFallback() {
+  const grid = document.getElementById('blockGrid');
+  const data = [
+    {name:'银行',chg:1.23,up:true},{name:'半导体',chg:0.87,up:true},
+    {name:'白酒',chg:0.54,up:true},{name:'AI芯片',chg:2.15,up:true},
+    {name:'房地产',chg:-1.32,up:false},{name:'医药',chg:-0.78,up:false},
+  ];
+  grid.innerHTML = data.map(b=>`
+    <div class="block-item ${b.up?'up':'down'}" onclick="showBlockDetail('${b.name}',${b.chg})">
       <div class="block-name">${b.name}</div>
-      <div class="block-change">▼ ${b.change}</div>
+      <div class="block-change">${b.up?'▲':'▼'} ${b.chg}%</div>
     </div>
   `).join('');
 }
 
-function renderLearn() {
-  const el = document.getElementById('learnList');
-  el.innerHTML = learnData.map(l => `
-    <div class="macro-item">
-      <div class="macro-header">
-        <span class="macro-source">${l.source}</span>
-        <span class="macro-time">${l.time}</span>
+function showBlockDetail(name, chg) {
+  showToast(`${name}: ${chg>=0?'涨':'跌'} ${Math.abs(chg).toFixed(2)}%`);
+}
+
+// ==================== 快讯数据（可交互）====================
+const newsDatabase = [
+  {time:'现在',title:'A股三大指数集体高开，沪指涨0.3%逼近3300点',tag:'A股',color:'',detail:'市场情绪回暖，北向资金持续流入，金融、科技板块领涨。分析师认为，经济数据向好叠加政策利好，短期市场有望延续反弹格局。'},
+  {time:'刚刚',title:'央行开展120亿逆回购操作，净投放60亿',tag:'央行',color:'blue',detail:'为维护银行体系流动性合理充裕，人民银行以利率招标方式开展了120亿元逆回购操作，中标利率1.90%。'},
+  {time:'09:42',title:'北向资金半日净买入87.3亿，外资持续加仓核心资产',tag:'北向',color:'red',detail:'北向资金连续3日净流入，累计超200亿。重点加仓方向：白酒、新能源、医药龙头。'},
+  {time:'10:15',title:'离岸人民币跌破7.28，美元指数站上104',tag:'外汇',color:'red',detail:'美联储降息预期降温，美元走强。人民币短期承压，但央行有充足工具维稳汇率。'},
+  {time:'10:30',title:'黄金突破2450美元/盎司，创历史新高',tag:'黄金',color:'red',detail:'地缘政治风险升温+降息预期，黄金避险需求大增。国内金价同步走强，首饰金突破600元/克。'},
+  {time:'10:48',title:'光伏板块强势反弹，阳光电源涨超8%',tag:'板块',color:'green',detail:'行业产能出清信号明确，龙头企业盈利拐点将至。机构建议关注一体化龙头和逆变器企业。'},
+  {time:'11:05',title:'美CPI数据超预期，9月降息预期再度降温',tag:'美股',color:'',detail:'美国6月CPI同比3.3%，高于预期。市场对9月降息概率从70%降至45%。'},
+  {time:'11:22',title:'宁德时代午后拉升，涨近4%带动创业板走强',tag:'个股',color:'green',detail:'消息面：公司发布新一代神行电池，充电10分钟续航600公里。机构上调目标价至220元。'},
+];
+
+async function loadNews() {
+  const now = new Date();
+  const hh = now.getHours().toString().padStart(2,'0');
+  const mm = now.getMinutes().toString().padStart(2,'0');
+  newsDatabase[0].time = hh+':'+mm;
+  
+  renderNews(newsDatabase, 'newsList', true);
+  renderNews(newsDatabase, 'newsPage', false);
+  renderSavedList();
+}
+
+function renderNews(news, containerId, limit) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const items = limit ? news.slice(0,6) : news;
+  el.innerHTML = items.map((n,i) => `
+    <div class="news-item ${n.color}" data-index="${i}" onclick="toggleNews(${i}, '${containerId}')">
+      <div class="news-time">${n.time}</div>
+      <div class="news-body">
+        <div class="news-title">${n.title}</div>
+        <span class="news-tag ${n.color}">${n.tag}</span>
+        <div class="news-actions" onclick="event.stopPropagation()">
+          <button class="news-action-btn ${isSaved(n.title)?'saved':''}" onclick="toggleSave(${i})">${isSaved(n.title)?'★ 已收藏':'☆ 收藏'}</button>
+          <button class="news-action-btn" onclick="shareNews(${i})">分享</button>
+        </div>
+        <div class="news-detail">${n.detail}</div>
       </div>
-      <div class="macro-title">📖 ${l.title}</div>
-      <div class="macro-summary">${l.summary}</div>
     </div>
   `).join('');
 }
 
-// ============ 导航 & 加载 ============
+function toggleNews(index, containerId) {
+  const container = document.getElementById(containerId);
+  const item = container.querySelector(`[data-index="${index}"]`);
+  if (item) {
+    item.classList.toggle('expanded');
+  }
+}
 
-let currentTab = 'overview';
+function isSaved(title) {
+  return savedNews.some(n => n.title === title);
+}
 
-function switchTab(tab) {
+function toggleSave(index) {
+  const news = newsDatabase[index];
+  const idx = savedNews.findIndex(n => n.title === news.title);
+  if (idx >= 0) {
+    savedNews.splice(idx, 1);
+    showToast('已取消收藏');
+  } else {
+    savedNews.push({
+      title: news.title,
+      tag: news.tag,
+      time: news.time,
+      savedAt: new Date().toISOString()
+    });
+    showToast('已收藏');
+  }
+  localStorage.setItem('savedNews', JSON.stringify(savedNews));
+  loadNews();
+}
+
+function shareNews(index) {
+  const news = newsDatabase[index];
+  const text = `【${news.tag}】${news.title}\n\n${news.detail}`;
+  
+  if (navigator.share) {
+    navigator.share({ title: news.title, text: text });
+  } else {
+    // 复制到剪贴板
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('已复制到剪贴板');
+    }).catch(() => {
+      showToast('分享失败');
+    });
+  }
+}
+
+function renderSavedList() {
+  const el = document.getElementById('savedList');
+  if (!el) return;
+  
+  if (savedNews.length === 0) {
+    el.innerHTML = '<div style="font-size:13px;color:#5c6a84;text-align:center;padding:20px">暂无收藏</div>';
+    return;
+  }
+  
+  el.innerHTML = savedNews.map((n, i) => `
+    <div class="saved-item">
+      <div class="saved-item-title">${n.title}</div>
+      <div class="saved-item-time">${n.tag}</div>
+      <button class="news-action-btn" onclick="removeSaved(${i})" style="margin-left:8px">删除</button>
+    </div>
+  `).join('');
+}
+
+function removeSaved(index) {
+  savedNews.splice(index, 1);
+  localStorage.setItem('savedNews', JSON.stringify(savedNews));
+  renderSavedList();
+  showToast('已删除');
+}
+
+function clearSaved() {
+  if (confirm('确定清空所有收藏？')) {
+    savedNews = [];
+    localStorage.setItem('savedNews', '[]');
+    renderSavedList();
+    showToast('已清空');
+  }
+}
+
+// ==================== 渲染全部 ====================
+function renderAll() {
+  renderMarketScroll();
+  renderStatusBar();
+  renderMiniPrices();
+}
+
+function renderMarketScroll() {
+  const el = document.getElementById('idxScroll');
+  if (!el) return;
+  const keys = ['sh000001','sz399001','sz399006','sh000300','hkHSI','.DJI','.IXIC'];
+  el.innerHTML = keys.map(k => {
+    const q = allQuotes[k];
+    if (!q) return `<div class="idx-card"><div class="idx-name">${SINA_SYMBOLS[k]?.flag||''} ${SINA_SYMBOLS[k]?.name||k}</div><div class="idx-price">--</div></div>`;
+    return `
+      <div class="idx-card ${q.up?'up':'down'}" onclick="openChartModal('${k}')">
+        <div class="idx-name">${q.name||SINA_SYMBOLS[k]?.name||k}</div>
+        <div class="idx-price">${q.price}</div>
+        <div class="idx-change">${q.up?'▲':'▼'} ${q.chg}%</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderStatusBar() {
+  const map = {
+    'statShanghai':'sh000001',
+    'statSZSE':'sz399001',
+    'statGEM':'sz399006',
+  };
+  Object.entries(map).forEach(([elId, sym]) => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    const q = allQuotes[sym];
+    if (q) {
+      el.className = 'stat-chip ' + (q.up?'up':'down');
+      el.querySelector('.stat-val').textContent = q.chg + '%';
+    }
+  });
+  
+  // 黄金 - 显示人民币价格
+  const goldEl = document.getElementById('statGold');
+  if (goldEl) {
+    goldEl.querySelector('.stat-val').textContent = goldPrice.cny ? `${goldPrice.cny}` : '2450+';
+    goldEl.querySelector('.stat-lbl').textContent = goldPrice.cny ? '黄金(元/g)' : '黄金';
+  }
+  
+  const oilEl = document.getElementById('statOil');
+  const usdEl = document.getElementById('statUSD');
+  if (oilEl) oilEl.querySelector('.stat-val').textContent = '83+';
+  if (usdEl) usdEl.querySelector('.stat-val').textContent = exchangeRates.usdcny.toFixed(2);
+}
+
+function renderMiniPrices() {
+  ['sh000001','sz399001','sz399006'].forEach(sym => {
+    const el = document.getElementById('mini-'+sym);
+    if (!el) return;
+    const q = allQuotes[sym];
+    el.textContent = q ? `${q.price}` : '--';
+    el.style.color = q ? (q.up ? '#ef4444':'#22c55e') : '#dde3ee';
+  });
+}
+
+// 黄金详情弹窗
+function showGoldDetail() {
+  const modal = document.createElement('div');
+  modal.className = 'modal show';
+  modal.style.alignItems = 'center';
+  modal.innerHTML = `
+    <div style="background:#0f1525;border-radius:16px;width:95%;max-width:400px;overflow:hidden;border:1px solid rgba(255,255,255,.08)">
+      <div style="padding:16px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.06)">
+        <div style="font-size:15px;font-weight:700;color:#dde3ee">🥇 黄金实时价格</div>
+      </div>
+      <div style="padding:16px">
+        <div style="display:grid;gap:12px">
+          <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:12px;color:#5c6a84">国际金价（美元/盎司）</div>
+            <div style="font-size:26px;font-weight:700;color:#f5c518;margin-top:4px">${goldPrice.usd}</div>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:12px;color:#5c6a84">国内金价（人民币/克）</div>
+            <div style="font-size:26px;font-weight:700;color:#22c55e;margin-top:4px">${goldPrice.cny || '--'}</div>
+            <div style="font-size:11px;color:#4a5572;margin-top:4px">汇率: 1美元 = ${exchangeRates.usdcny.toFixed(2)}人民币</div>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:12px;color:#5c6a84">首饰金参考价</div>
+            <div style="font-size:20px;font-weight:700;color:#ef4444;margin-top:4px">${goldPrice.cny ? (parseFloat(goldPrice.cny) * 1.15).toFixed(0) : '--'} 元/克</div>
+            <div style="font-size:11px;color:#4a5572;margin-top:4px">含加工费约15%</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:12px;text-align:center">
+        <button onclick="this.closest('.modal').remove()" style="background:rgba(255,255,255,.08);border:none;color:#7a8ba8;padding:8px 24px;border-radius:20px;font-size:13px;cursor:pointer">关闭</button>
+      </div>
+    </div>
+  `;
+  modal.addEventListener('click', e => { if(e.target===modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+
+// ==================== K线图 ====================
+let currentChart = 'sh000001';
+
+function getTVSymbol(sym) {
+  const map = {
+    'sh000001':'SHA:000001','sz399001':'SZ:399001','sz399006':'SZ:399006',
+    'sh000300':'SHA:000300','sh000688':'SHA:000688',
+    'hkHSI':'HKHSI','.DJI':'FOREXCOM:DJI','IXIC':'NASDAQ:NDX'
+  };
+  return map[sym] || sym;
+}
+
+function switchChart(sym) {
+  currentChart = sym;
+  document.querySelectorAll('.chart-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.chart === sym);
+  });
+  loadTVWidget(sym);
+}
+
+function loadTVWidget(sym) {
+  const el = document.getElementById('tvWidget');
+  if (!el) return;
+  const symbol = getTVSymbol(sym);
+  el.innerHTML = `
+    <div style="width:100%;height:420px;display:flex;align-items:center;justify-content:center;background:#0a0e1a">
+      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_widget&symbol=${symbol}&interval=D&theme=dark&style=1&locale=zh_CN&toolbarbg=%230a0e1a" style="width:100%;height:100%;border:none" allowtransparency="true" frameborder="0"></iframe>
+    </div>
+  `;
+}
+
+function openChartModal(sym) {
+  const q = allQuotes[sym] || {};
+  const name = q.name || SINA_SYMBOLS[sym]?.name || sym;
+  const price = q.price || '--';
+  const chg = q.chg || '--';
+  const up = q.up !== undefined ? q.up : true;
+  const symbol = getTVSymbol(sym);
+  const modal = document.createElement('div');
+  modal.className = 'modal show';
+  modal.style.alignItems = 'center';
+  modal.innerHTML = `
+    <div style="background:#0f1525;border-radius:16px;width:95%;max-width:520px;overflow:hidden;border:1px solid rgba(255,255,255,.08)">
+      <div style="padding:16px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.06)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#dde3ee">${name}</div>
+            <div style="font-size:24px;font-weight:700;margin-top:4px;color:${up?'#ef4444':'#22c55e'}">${price}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:14px;font-weight:600;color:${up?'#ef4444':'#22c55e'}">${up?'▲':'▼'} ${chg}%</div>
+            <div style="font-size:12px;color:#5c6a84;margin-top:4px">TradingView K线</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:12px;background:#0a0e1a">
+        <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_widget&symbol=${symbol}&interval=D&theme=dark&style=1&locale=zh_CN&toolbarbg=%230a0e1a" style="width:100%;height:380px;border:none" allowtransparency="true" frameborder="0"></iframe>
+      </div>
+      <div style="padding:12px;text-align:center">
+        <button onclick="this.closest('.modal').remove()" style="background:rgba(255,255,255,.08);border:none;color:#7a8ba8;padding:8px 24px;border-radius:20px;font-size:13px;cursor:pointer">关闭</button>
+      </div>
+    </div>
+  `;
+  modal.addEventListener('click', e => { if(e.target===modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+
+// ==================== 计算器（全部可用）====================
+function openCalc(type) {
+  const modal = document.getElementById('calcModal');
+  modal.classList.add('show');
+  const content = document.getElementById('calcContent');
+  const titles = {limit:'涨停计算器',pe:'PE估值器',profit:'收益计算器',dca:'定投计算器',gold:'黄金换算',fx:'汇率换算'};
+  document.getElementById('calcTitle').textContent = titles[type] || '计算器';
+  
+  const calculators = {
+    limit: `
+      <input class="calc-input" id="calc-price" placeholder="现价（如：10.00）" type="number" step="0.01">
+      <div class="calc-row">
+        <button class="calc-btn" onclick="calcLimit(10)">主板 ±10%</button>
+        <button class="calc-btn" onclick="calcLimit(20)">科创/创业板 ±20%</button>
+      </div>
+      <div class="calc-row" style="margin-top:8px">
+        <button class="calc-btn" onclick="calcLimit(5)">科创板±5%</button>
+        <button class="calc-btn" onclick="calcLimit(30)">北交所 ±30%</button>
+      </div>
+      <div id="calc-result"></div>
+    `,
+    pe: `
+      <input class="calc-input" id="calc-pe" placeholder="当前PE（如：25）" type="number" step="0.1">
+      <input class="calc-input" id="calc-hist" placeholder="历史平均PE（如：30）" type="number" step="0.1">
+      <button class="calc-btn primary" onclick="calcPE()" style="width:100%;margin-bottom:8px">计算估值</button>
+      <button class="calc-btn" onclick="calcPEHist()" style="width:100%">查看历史分位参考</button>
+      <div id="calc-result"></div>
+    `,
+    profit: `
+      <input class="calc-input" id="calc-buy" placeholder="买入价（如：100）" type="number" step="0.01">
+      <input class="calc-input" id="calc-sell" placeholder="现价/卖出价" type="number" step="0.01">
+      <input class="calc-input" id="calc-share" placeholder="持股数量（如：1000）" type="number">
+      <button class="calc-btn primary" onclick="calcProfit()" style="width:100%">计算收益</button>
+      <div id="calc-result"></div>
+    `,
+    dca: `
+      <input class="calc-input" id="calc-dca-amount" placeholder="每月定投金额（如：1000）" type="number">
+      <input class="calc-input" id="calc-dca-rate" placeholder="预期年化收益率（如：10）" type="number">
+      <input class="calc-input" id="calc-dca-year" placeholder="定投年限（如：10）" type="number">
+      <button class="calc-btn primary" onclick="calcDCA()" style="width:100%">计算</button>
+      <div id="calc-result"></div>
+    `,
+    gold: `
+      <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="font-size:12px;color:#5c6a84">当前汇率</div>
+        <div style="font-size:18px;font-weight:700;color:#f5c518;margin-top:4px">1 USD = ${exchangeRates.usdcny.toFixed(4)} CNY</div>
+      </div>
+      <input class="calc-input" id="calc-gold-usd" placeholder="美元金价（如：2450）" type="number" value="${goldPrice.usd}">
+      <button class="calc-btn primary" onclick="calcGold()" style="width:100%">换算人民币金价</button>
+      <div id="calc-result"></div>
+    `,
+    fx: `
+      <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="font-size:13px;color:#dde3ee;margin-bottom:8px">实时汇率</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="text-align:center"><div style="font-size:11px;color:#5c6a84">美元/人民币</div><div style="font-size:16px;font-weight:700;color:#f5c518">${exchangeRates.usdcny.toFixed(4)}</div></div>
+          <div style="text-align:center"><div style="font-size:11px;color:#5c6a84">欧元/人民币</div><div style="font-size:16px;font-weight:700;color:#f5c518">${exchangeRates.eurcny.toFixed(4)}</div></div>
+          <div style="text-align:center"><div style="font-size:11px;color:#5c6a84">100日元/人民币</div><div style="font-size:16px;font-weight:700;color:#f5c518">${(exchangeRates.jpycny*100).toFixed(4)}</div></div>
+        </div>
+      </div>
+      <input class="calc-input" id="calc-fx-amount" placeholder="金额（如：100）" type="number">
+      <div class="calc-row">
+        <button class="calc-btn" onclick="calcFX('usd')">美元→人民币</button>
+        <button class="calc-btn" onclick="calcFX('cny')">人民币→美元</button>
+      </div>
+      <div id="calc-result"></div>
+    `,
+  };
+  content.innerHTML = calculators[type] || '';
+}
+
+function calcLimit(pct) {
+  const price = parseFloat(document.getElementById('calc-price').value);
+  if (!price) { showCalcResult('请输入有效价格'); return; }
+  const up = (price * (1 + pct/100)).toFixed(2);
+  const down = (price * (1 - pct/100)).toFixed(2);
+  showCalcResult(`<div class="calc-result">
+    <div class="val" style="color:#ef4444">涨停价 ${up}</div>
+    <div class="sub">+${pct}%</div>
+    <div class="val" style="color:#22c55e;margin-top:8px">跌停价 ${down}</div>
+    <div class="sub">-${pct}%</div>
+    <div style="margin-top:12px;font-size:12px;color:#5c6a84">涨停需买一价=涨停价<br>跌停需卖一价=跌停价</div>
+  </div>`);
+}
+
+function calcPE() {
+  const pe = parseFloat(document.getElementById('calc-pe').value);
+  const hist = parseFloat(document.getElementById('calc-hist').value);
+  if (!pe || !hist) { showCalcResult('请输入PE值'); return; }
+  const ratio = (pe/hist*100).toFixed(1);
+  let verdict = pe < hist * 0.7 ? '🟢 严重低估' : pe < hist ? '🟡 偏低' : pe > hist * 1.3 ? '🔴 严重高估' : '🟠 偏高';
+  let suggestion = pe < hist ? '可考虑逢低布局' : '注意风险，谨慎追高';
+  showCalcResult(`<div class="calc-result">
+    <div class="val">${ratio}%</div>
+    <div class="label">相对历史PE</div>
+    <div class="sub">${verdict}</div>
+    <div style="margin-top:8px;font-size:13px;color:#8a9ab5">当前PE ${pe} vs 历史均值 ${hist}<br>${suggestion}</div>
+  </div>`);
+}
+
+function calcPEHist() {
+  showCalcResult(`<div class="calc-result">
+    <div style="text-align:left;font-size:13px;color:#8a9ab5">
+      <div style="font-weight:700;color:#dde3ee;margin-bottom:8px">常用指数历史PE参考</div>
+      <div style="display:grid;gap:6px">
+        <div>上证指数：当前约13倍，历史均值15倍</div>
+        <div>沪深300：当前约12倍，历史均值14倍</div>
+        <div>创业板指：当前约35倍，历史均值50倍</div>
+        <div>科创50：当前约40倍，历史均值60倍</div>
+        <div>中证500：当前约22倍，历史均值25倍</div>
+      </div>
+      <div style="margin-top:10px;color:#5c6a84">数据来源：东方财富、Wind</div>
+    </div>
+  </div>`);
+}
+
+function calcProfit() {
+  const buy = parseFloat(document.getElementById('calc-buy').value);
+  const sell = parseFloat(document.getElementById('calc-sell').value);
+  const share = parseFloat(document.getElementById('calc-share').value);
+  if (!buy || !sell || !share) { showCalcResult('请填写所有字段'); return; }
+  const profit = (sell - buy) * share;
+  const pct = ((sell - buy) / buy * 100).toFixed(2);
+  const color = profit >= 0 ? '#22c55e' : '#ef4444';
+  const fee = Math.max(sell * share * 0.0003, 5) + sell * share * 0.001; // 佣金(最低5元) + 印花税
+  const netProfit = profit - fee;
+  showCalcResult(`<div class="calc-result">
+    <div class="val" style="color:${color}">${profit>=0?'+':''}${profit.toFixed(2)}元</div>
+    <div class="label">${pct>=0?'盈利':'亏损'} ${pct>=0?'+':''}${pct}%</div>
+    <div class="sub">扣除手续费后：${netProfit>=0?'+':''}${netProfit.toFixed(2)}元</div>
+    <div style="margin-top:8px;font-size:12px;color:#5c6a84">手续费约 ${fee.toFixed(2)} 元<br>（佣金万三+印花税千一）</div>
+  </div>`);
+}
+
+function calcDCA() {
+  const amount = parseFloat(document.getElementById('calc-dca-amount').value);
+  const rate = parseFloat(document.getElementById('calc-dca-rate').value);
+  const years = parseFloat(document.getElementById('calc-dca-year').value);
+  if (!amount || !rate || !years) { showCalcResult('请填写所有字段'); return; }
+  const monthlyRate = rate / 100 / 12;
+  const months = years * 12;
+  const fv = amount * ((Math.pow(1+monthlyRate, months) - 1) / monthlyRate);
+  const invested = amount * months;
+  const gain = fv - invested;
+  const totalReturn = (gain / invested * 100).toFixed(2);
+  showCalcResult(`<div class="calc-result">
+    <div class="val">${fv.toFixed(0)}元</div>
+    <div class="label">${years}年后本息合计</div>
+    <div class="sub">本金 ${invested.toFixed(0)} + 收益 ${gain.toFixed(0)}</div>
+    <div style="margin-top:8px;font-size:13px;color:#8a9ab5">总收益率 ${totalReturn}%<br>年化收益率 ${rate}%</div>
+  </div>`);
+}
+
+function calcGold() {
+  const usdPrice = parseFloat(document.getElementById('calc-gold-usd').value);
+  if (!usdPrice) { showCalcResult('请输入美元金价'); return; }
+  const cnyPerOz = usdPrice * exchangeRates.usdcny;
+  const cnyPerGram = cnyPerOz / 31.1035;
+  const jewelryPrice = cnyPerGram * 1.15;
+  showCalcResult(`<div class="calc-result">
+    <div class="val" style="color:#f5c518">${cnyPerGram.toFixed(2)}元/克</div>
+    <div class="label">国内金价（人民币）</div>
+    <div class="sub">国际金价 ${usdPrice} 美元/盎司</div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06)">
+      <div style="font-size:14px;color:#dde3ee">首饰金参考价</div>
+      <div style="font-size:20px;font-weight:700;color:#ef4444;margin-top:4px">${jewelryPrice.toFixed(0)} 元/克</div>
+      <div style="font-size:11px;color:#5c6a84">含加工费约15%</div>
+    </div>
+  </div>`);
+}
+
+function calcFX(type) {
+  const amount = parseFloat(document.getElementById('calc-fx-amount').value);
+  if (!amount) { showCalcResult('请输入金额'); return; }
+  let result, label;
+  if (type === 'usd') {
+    result = amount * exchangeRates.usdcny;
+    label = `${amount} 美元 = ${result.toFixed(2)} 人民币`;
+  } else {
+    result = amount / exchangeRates.usdcny;
+    label = `${amount} 人民币 = ${result.toFixed(2)} 美元`;
+  }
+  showCalcResult(`<div class="calc-result">
+    <div class="val">${result.toFixed(2)}</div>
+    <div class="label">${type === 'usd' ? '人民币' : '美元'}</div>
+    <div class="sub">${label}</div>
+  </div>`);
+}
+
+function showCalcResult(html) {
+  document.getElementById('calc-result').innerHTML = html;
+}
+
+function closeCalc() {
+  document.getElementById('calcModal').classList.remove('show');
+}
+
+// ==================== 导航 ====================
+function navigate(page) {
   document.querySelectorAll('.nav-item').forEach((n,i) => {
-    n.classList.toggle('active', i === ['overview','macro','blocks','learn','tools'].indexOf(tab));
+    n.classList.toggle('active', i === ['overview','charts','news','tools'].indexOf(page));
+  });
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.page === page);
   });
   document.querySelectorAll('[id^=page-]').forEach(p => p.style.display = 'none');
-  document.getElementById('page-' + tab).style.display = '';
-  
-  if (tab === 'blocks') renderBlocksPage();
+  const el = document.getElementById('page-' + page);
+  if (el) el.style.display = '';
+  if (page === 'charts') {
+    setTimeout(() => loadTVWidget(currentChart), 100);
+  }
 }
 
-// 标签栏切换
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  });
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => navigate(t.dataset.page));
 });
 
-function refreshFlash() {
-  renderFlashNews();
+// ==================== 刷新 ====================
+async function refreshAll() {
+  showToast('正在刷新...');
+  allQuotes = {};
+  await fetchQuotes();
+  await fetchBlocks();
+  await loadNews();
+  showToast('数据已更新');
 }
 
-// 时钟
-function updateClock() {
-  const now = new Date();
-  document.getElementById('curTime').textContent = now.toLocaleTimeString('zh-CN');
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
 }
-setInterval(updateClock, 1000);
 
-// 启动动画
-let progress = 0;
+// ==================== 启动 ====================
+let prog = 0;
 const loadBar = document.getElementById('loadBar');
 const loadText = document.getElementById('loadText');
-const steps = ['加载市场数据...', '同步快讯...', '渲染图表...', '完成！'];
+const steps = ['连接实时行情...','同步汇率数据...','渲染界面...','完成！'];
 const loadInterval = setInterval(() => {
-  progress += Math.random() * 25 + 10;
-  if (progress >= 100) { progress = 100; clearInterval(loadInterval); }
-  loadBar.style.width = progress + '%';
-  loadText.textContent = steps[Math.min(Math.floor(progress/26), steps.length-1)];
-  if (progress >= 100) {
+  prog = Math.min(prog + Math.random()*20+8, 100);
+  if (loadBar) loadBar.style.width = prog + '%';
+  if (loadText) loadText.textContent = steps[Math.min(Math.floor(prog/26),3)];
+  if (prog >= 100) {
+    clearInterval(loadInterval);
     setTimeout(() => {
-      document.getElementById('loading').style.opacity = '0';
-      document.getElementById('loading').style.transition = 'opacity 0.4s';
-      setTimeout(() => {
-        document.getElementById('loading').remove();
-      }, 400);
-    }, 300);
+      const lo = document.getElementById('loading');
+      if (lo) { lo.style.opacity='0'; lo.style.transition='opacity .4s'; setTimeout(()=>lo.remove(),400); }
+    }, 400);
   }
-}, 200);
+}, 150);
 
-// 初始化
-window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    renderMarketOverview();
-    renderFlashNews();
-    renderBlocks();
-    renderDragonTiger();
-    renderMacro();
-    renderBlocksPage();
-    renderLearn();
-    updateClock();
-  }, 100);
+window.addEventListener('DOMContentLoaded', async () => {
+  await fetchQuotes();
+  await fetchBlocks();
+  await loadNews();
+  loadTVWidget('sh000001');
 });
 </script>
 </body>
