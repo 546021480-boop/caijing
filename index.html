@@ -330,7 +330,8 @@ const CLOCK_INTERVAL = setInterval(() => {
 
 // 汇率缓存
 let exchangeRates = { usdcny: 7.28, eurcny: 7.85, jpycny: 0.048 };
-let goldPrice = { usd: 2450, cny: null };
+let goldPrice = { usd: null, cny: null };
+let oilPrice = { usd: null };
 
 // 收藏新闻（localStorage）
 let savedNews = JSON.parse(localStorage.getItem('savedNews') || '[]');
@@ -361,11 +362,40 @@ async function fetchQuotes() {
       parseSinaQuotes(text);
     }
   } catch(e){}
-  
+
+  // 获取黄金、原油实时数据
+  try {
+    const r = await fetch('https://hq.sinajs.cn/list=hf_GC,hf_SI,hf_CL', {
+      headers:{'Referer':'https://finance.sina.com.cn','User-Agent':'Mozilla/5.0'}
+    });
+    if (r.ok) {
+      const text = await r.text();
+      parseCommodityQuotes(text);
+    }
+  } catch(e){}
+
   // 获取汇率
   await fetchExchangeRates();
-  
+
   renderAll();
+}
+
+function parseCommodityQuotes(text) {
+  const lines = text.split('\n');
+  lines.forEach(line => {
+    const m = line.match(/hq_str_hf_(.+?)="(.+?)"/);
+    if (!m) return;
+    const sym = m[1];
+    const fields = m[2].split(',');
+    if (sym === 'GC' && fields.length >= 2) {
+      // 纽约黄金期货，美元/盎司
+      goldPrice.usd = parseFloat(fields[0]) || parseFloat(fields[1]);
+    }
+    if (sym === 'CL' && fields.length >= 2) {
+      // 纽约原油期货，美元/桶
+      oilPrice.usd = parseFloat(fields[0]) || parseFloat(fields[1]);
+    }
+  });
 }
 
 async function fetchExchangeRates() {
@@ -392,7 +422,9 @@ async function fetchExchangeRates() {
   } catch(e) {}
   
   // 计算黄金人民币价格
-  goldPrice.cny = (goldPrice.usd * exchangeRates.usdcny / 31.1035).toFixed(2); // 盎司转克
+  if (goldPrice.usd) {
+    goldPrice.cny = (goldPrice.usd * exchangeRates.usdcny / 31.1035).toFixed(2); // 盎司转克
+  }
 }
 
 function parseSinaQuotes(text) {
@@ -632,13 +664,13 @@ function renderStatusBar() {
   // 黄金 - 显示人民币价格
   const goldEl = document.getElementById('statGold');
   if (goldEl) {
-    goldEl.querySelector('.stat-val').textContent = goldPrice.cny ? `${goldPrice.cny}` : '2450+';
+    goldEl.querySelector('.stat-val').textContent = goldPrice.cny ? `${goldPrice.cny}` : '--';
     goldEl.querySelector('.stat-lbl').textContent = goldPrice.cny ? '黄金(元/g)' : '黄金';
   }
   
   const oilEl = document.getElementById('statOil');
   const usdEl = document.getElementById('statUSD');
-  if (oilEl) oilEl.querySelector('.stat-val').textContent = '83+';
+  if (oilEl) oilEl.querySelector('.stat-val').textContent = oilPrice.usd ? oilPrice.usd.toFixed(1) : '--';
   if (usdEl) usdEl.querySelector('.stat-val').textContent = exchangeRates.usdcny.toFixed(2);
 }
 
@@ -666,7 +698,7 @@ function showGoldDetail() {
         <div style="display:grid;gap:12px">
           <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:14px;text-align:center">
             <div style="font-size:12px;color:#5c6a84">国际金价（美元/盎司）</div>
-            <div style="font-size:26px;font-weight:700;color:#f5c518;margin-top:4px">${goldPrice.usd}</div>
+            <div style="font-size:26px;font-weight:700;color:#f5c518;margin-top:4px">${goldPrice.usd ? goldPrice.usd.toFixed(1) : '--'}</div>
           </div>
           <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:14px;text-align:center">
             <div style="font-size:12px;color:#5c6a84">国内金价（人民币/克）</div>
