@@ -376,8 +376,8 @@ async function fetchQuotes() {
     }
   } catch(e){}
 
-  // 获取融通金（国内金价）- 东方财富接口
-  await fetchRtGold();
+  // 获取融通金（国内金价）- 东方财富接口（仅AU9999可稳定获取）
+  await fetchRtGoldAu9999();
 
   // 获取汇率
   await fetchExchangeRates();
@@ -403,64 +403,24 @@ function parseCommodityQuotes(text) {
   });
 }
 
-// 获取融通金（国内金价）数据
-async function fetchRtGold() {
+// 获取黄金9999实时数据（唯一稳定可用的国内金价接口）
+async function fetchRtGoldAu9999() {
   try {
-    // 东方财富 AU9999（黄金9999）
-    const r1 = await fetch('https://push2.eastmoney.com/api/qt/stock/get?secid=118.AU9999&fields=f43,f44,f45,f46,f47,f58', {
+    const r = await fetch('https://push2.eastmoney.com/api/qt/stock/get?secid=118.AU9999&fields=f43,f44,f45,f47,f58', {
       headers:{'Referer':'https://data.eastmoney.com','User-Agent':'Mozilla/5.0'}
     });
-    if (r1.ok) {
-      const d = await r1.json();
-      if (d.data) {
+    if (r.ok) {
+      const d = await r.json();
+      if (d.data && d.data.f43) {
         rtGold.au9999 = {
-          price: d.data.f43 / 100,  // 元/克
+          price: d.data.f43 / 100,  // f43原始单位：1/100元/克
           high: d.data.f44 / 100,
           low: d.data.f45 / 100,
           open: d.data.f46 / 100,
           change: d.data.f47 / 100,
           name: d.data.f58 || '黄金9999'
         };
-        // 同步更新人民币金价
         goldPrice.cny = rtGold.au9999.price.toFixed(2);
-      }
-    }
-  } catch(e){}
-
-  try {
-    // 东方财富 AuTD（黄金T+D）
-    const r2 = await fetch('https://push2.eastmoney.com/api/qt/stock/get?secid=113.AuTD&fields=f43,f44,f45,f46,f47,f58,f169,f170', {
-      headers:{'Referer':'https://data.eastmoney.com','User-Agent':'Mozilla/5.0'}
-    });
-    if (r2.ok) {
-      const d = await r2.json();
-      if (d.data) {
-        rtGold.autd = {
-          price: d.data.f43 / 100,
-          high: d.data.f44 / 100,
-          low: d.data.f45 / 100,
-          change: d.data.f47 / 100,
-          name: d.data.f58 || '黄金T+D'
-        };
-      }
-    }
-  } catch(e){}
-
-  try {
-    // 东方财富 AgTD（白银T+D）
-    const r3 = await fetch('https://push2.eastmoney.com/api/qt/stock/get?secid=113.AgTD&fields=f43,f44,f45,f46,f47,f58', {
-      headers:{'Referer':'https://data.eastmoney.com','User-Agent':'Mozilla/5.0'}
-    });
-    if (r3.ok) {
-      const d = await r3.json();
-      if (d.data) {
-        rtGold.agtd = {
-          price: d.data.f43 / 1000,  // 元/千克 → 元/克
-          high: d.data.f44 / 1000,
-          low: d.data.f45 / 1000,
-          change: d.data.f47 / 1000,
-          name: d.data.f58 || '白银T+D'
-        };
       }
     }
   } catch(e){}
@@ -571,7 +531,7 @@ const newsDatabase = [
   {time:'刚刚',title:'央行开展120亿逆回购操作，净投放60亿',tag:'央行',color:'blue',detail:'为维护银行体系流动性合理充裕，人民银行以利率招标方式开展了120亿元逆回购操作，中标利率1.90%。'},
   {time:'09:42',title:'北向资金半日净买入87.3亿，外资持续加仓核心资产',tag:'北向',color:'red',detail:'北向资金连续3日净流入，累计超200亿。重点加仓方向：白酒、新能源、医药龙头。'},
   {time:'10:15',title:'离岸人民币跌破7.28，美元指数站上104',tag:'外汇',color:'red',detail:'美联储降息预期降温，美元走强。人民币短期承压，但央行有充足工具维稳汇率。'},
-  {time:'10:30',title:'黄金突破2450美元/盎司，创历史新高',tag:'黄金',color:'red',detail:'地缘政治风险升温+降息预期，黄金避险需求大增。国内金价同步走强，首饰金突破600元/克。'},
+  {time:'10:30',title:'国际金价突破4500美元/盎司，刷新历史记录',tag:'黄金',color:'red',detail:'受地缘政治风险和全球央行购金潮推动，国际金价持续走强。国内黄金9999报价约1000-1010元/克，首饰金报价700-800元/克。'},
   {time:'10:48',title:'光伏板块强势反弹，阳光电源涨超8%',tag:'板块',color:'green',detail:'行业产能出清信号明确，龙头企业盈利拐点将至。机构建议关注一体化龙头和逆变器企业。'},
   {time:'11:05',title:'美CPI数据超预期，9月降息预期再度降温',tag:'美股',color:'',detail:'美国6月CPI同比3.3%，高于预期。市场对9月降息概率从70%降至45%。'},
   {time:'11:22',title:'宁德时代午后拉升，涨近4%带动创业板走强',tag:'个股',color:'green',detail:'消息面：公司发布新一代神行电池，充电10分钟续航600公里。机构上调目标价至220元。'},
@@ -770,28 +730,18 @@ function showGoldDetail() {
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
           ${rtGold.au9999 ? `
-          <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:12px;text-align:center">
-            <div style="font-size:11px;color:#5c6a84">黄金9999</div>
-            <div style="font-size:20px;font-weight:700;color:#22c55e;margin-top:2px">${rtGold.au9999.price}</div>
-            <div style="font-size:11px;color:${rtGold.au9999.change>=0?'#ef4444':'#22c55e'};margin-top:2px">${rtGold.au9999.change>=0?'+':''}${rtGold.au9999.change}</div>
-            <div style="font-size:9px;color:#4a5572;margin-top:2px">高${rtGold.au9999.low} / 低${rtGold.au9999.high}</div>
+          <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:#5c6a84">黄金9999（元/克）</div>
+            <div style="font-size:22px;font-weight:700;color:#22c55e;margin-top:4px">${rtGold.au9999.price}</div>
+            <div style="font-size:12px;color:${rtGold.au9999.change>=0?'#ef4444':'#22c55e'};margin-top:4px">${rtGold.au9999.change>=0?'+':''}${rtGold.au9999.change.toFixed(2)}</div>
+            <div style="font-size:10px;color:#4a5572;margin-top:6px">今开 ${rtGold.au9999.open} · 最高 ${rtGold.au9999.high} · 最低 ${rtGold.au9999.low}</div>
           </div>
-          ` : ''}
-          ${rtGold.autd ? `
-          <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:12px;text-align:center">
-            <div style="font-size:11px;color:#5c6a84">黄金T+D</div>
-            <div style="font-size:20px;font-weight:700;color:#f59e0b;margin-top:2px">${rtGold.autd.price}</div>
-            <div style="font-size:11px;color:${rtGold.autd.change>=0?'#ef4444':'#22c55e'};margin-top:2px">${rtGold.autd.change>=0?'+':''}${rtGold.autd.change}</div>
-            <div style="font-size:9px;color:#4a5572;margin-top:2px">高${rtGold.autd.high} / 低${rtGold.autd.low}</div>
+          ` : '<div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:14px;text-align:center"><div style="font-size:11px;color:#5c6a84">黄金9999（元/克）</div><div style="font-size:22px;font-weight:700;color:#22c55e;margin-top:4px">--</div></div>'}
+          <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:#5c6a84">首饰金参考价</div>
+            <div style="font-size:22px;font-weight:700;color:#ef4444;margin-top:4px">${goldPrice.cny ? (parseFloat(goldPrice.cny) * 1.15).toFixed(0) : '--'}</div>
+            <div style="font-size:10px;color:#4a5572;margin-top:4px">含约15%工费</div>
           </div>
-          ` : ''}
-          ${rtGold.agtd ? `
-          <div style="background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.2);border-radius:10px;padding:12px;text-align:center">
-            <div style="font-size:11px;color:#5c6a84">白银T+D</div>
-            <div style="font-size:20px;font-weight:700;color:#94a3b8;margin-top:2px">${rtGold.agtd.price}</div>
-            <div style="font-size:11px;color:${rtGold.agtd.change>=0?'#ef4444':'#22c55e'};margin-top:2px">${rtGold.agtd.change>=0?'+':''}${rtGold.agtd.change}</div>
-          </div>
-          ` : ''}
         </div>
 
         <!-- 国际金价 -->
@@ -940,7 +890,17 @@ function openCalc(type) {
         <div style="font-size:12px;color:#5c6a84">当前汇率</div>
         <div style="font-size:18px;font-weight:700;color:#f5c518;margin-top:4px">1 USD = ${exchangeRates.usdcny.toFixed(4)} CNY</div>
       </div>
-      <input class="calc-input" id="calc-gold-usd" placeholder="美元金价（如：2450）" type="number" value="${goldPrice.usd}">
+      <input class="calc-input" id="calc-gold-usd" placeholder="国际金价（美元/盎司，如：4540）" type="number" value="${goldPrice.usd || ''}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div style="background:rgba(34,197,94,.08);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:11px;color:#5c6a84">国内金价</div>
+          <div style="font-size:16px;font-weight:700;color:#22c55e;margin-top:2px">${rtGold.au9999 ? rtGold.au9999.price + ' 元/克' : '--'}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:11px;color:#5c6a84">汇率</div>
+          <div style="font-size:16px;font-weight:700;color:#f5c518;margin-top:2px">${exchangeRates.usdcny.toFixed(4)}</div>
+        </div>
+      </div>
       <button class="calc-btn primary" onclick="calcGold()" style="width:100%">换算人民币金价</button>
       <div id="calc-result"></div>
     `,
